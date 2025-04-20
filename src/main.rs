@@ -13,6 +13,7 @@ async fn main() {
     dotenv().ok();
     let mut mqttoptions = MqttOptions::new("test-client2", "192.168.100.2", 1883);
     mqttoptions.set_keep_alive(Duration::from_secs(5));
+    println!("Inicio");
 
     // Create the client and event loop
     let (client, mut eventloop) = AsyncClient::new(mqttoptions, 10);
@@ -22,13 +23,7 @@ async fn main() {
         return;
     }
 
-    if let Err(e) = client
-        .publish("test/topic", QoS::AtLeastOnce, false, "Hola desde Rust")
-        .await
-    {
-        eprintln!("Failed to publish: {:?}", e);
-        return;
-    }
+    println!("Suscrito al topico");
 
     let user = var("AIDOT_USER").expect("Missing AIDOT_USER in environment");
     let pass = var("AIDOT_PASSWORD").expect("Missing AIDOT_PASSWORD in environment");
@@ -128,7 +123,7 @@ async fn main() {
                         // Tomar captura de pantalla solo del elemento <video>
                         println!("📸 Tomando captura del elemento <video>...");
                         let screenshot = video_elem.screenshot_as_png().await.unwrap();
-                        std::fs::write("~/home-assistant/data/captura_video.png", screenshot)
+                        std::fs::write("/home/lucas/home-assistant/data/captura_video.png", screenshot)
                             .unwrap();
                         println!("✅ Captura guardada como captura_video.png");
                     }
