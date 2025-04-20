@@ -6,9 +6,11 @@ use thirtyfour::{By, WebDriver};
 use tokio;
 use tokio::time;
 use tokio::time::sleep;
+use dotenv::dotenv;
 
 #[tokio::main]
 async fn main() {
+    dotenv().ok();
     let mut mqttoptions = MqttOptions::new("test-client2", "192.168.100.2", 1883);
     mqttoptions.set_keep_alive(Duration::from_secs(5));
 
@@ -28,9 +30,8 @@ async fn main() {
         return;
     }
 
-
-    let user = var("AIDOT_USER").expect("Missing ENCRYPTION_KEY in environment");
-    let pass = var("AIDOT_PASSWORD").expect("Missing ENCRYPTION_KEY in environment");
+    let user = var("AIDOT_USER").expect("Missing AIDOT_USER in environment");
+    let pass = var("AIDOT_PASSWORD").expect("Missing AIDOT_PASSWORD in environment");
 
     // Inicializar WebDriver (Chrome)
     let mut caps = DesiredCapabilities::chrome();
