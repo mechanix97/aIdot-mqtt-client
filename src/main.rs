@@ -28,6 +28,34 @@ async fn main() {
         return;
     }
 
+
+    let user = var("AIDOT_USER").expect("Missing ENCRYPTION_KEY in environment");
+    let pass = var("AIDOT_PASSWORD").expect("Missing ENCRYPTION_KEY in environment");
+
+    // Inicializar WebDriver (Chrome)
+    let mut caps = DesiredCapabilities::chrome();
+
+    caps.add_chrome_arg("--headless").unwrap();
+    caps.add_chrome_arg("--no-sandbox").unwrap();
+    caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
+
+    caps.add_chrome_arg("--use-fake-ui-for-media-stream")
+        .unwrap();
+    caps.add_chrome_arg("--use-fake-device-for-media-stream")
+        .unwrap();
+    caps.add_chrome_arg("--allow-file-access-from-files")
+        .unwrap();
+    caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
+    caps.add_chrome_arg("--no-sandbox").unwrap();
+    caps.add_chrome_arg("--disable-web-security").unwrap();
+    caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
+        .unwrap();
+
+    // caps.add_chrome_option("profile.default_content_setting_values.media_stream_mic", json!(1)).unwrap();
+
+    let web_driver = WebDriver::new("http://localhost:9515", caps).await.unwrap();
+    
+
     println!("Esperando mensajes...");
 
     loop {
@@ -36,32 +64,7 @@ async fn main() {
                 println!("Connected to broker!");
             }
             Ok(Event::Incoming(Incoming::Publish(_p))) => {
-                let user = var("AIDOT_USER").expect("Missing ENCRYPTION_KEY in environment");
-                let pass = var("AIDOT_PASSWORD").expect("Missing ENCRYPTION_KEY in environment");
-
-                // Inicializar WebDriver (Chrome)
-                let mut caps = DesiredCapabilities::chrome();
-
-                caps.add_chrome_arg("--headless").unwrap();
-                caps.add_chrome_arg("--no-sandbox").unwrap();
-                caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
-
-                caps.add_chrome_arg("--use-fake-ui-for-media-stream")
-                    .unwrap();
-                caps.add_chrome_arg("--use-fake-device-for-media-stream")
-                    .unwrap();
-                caps.add_chrome_arg("--allow-file-access-from-files")
-                    .unwrap();
-                caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
-                caps.add_chrome_arg("--no-sandbox").unwrap();
-                caps.add_chrome_arg("--disable-web-security").unwrap();
-                caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
-                    .unwrap();
-
-                // caps.add_chrome_option("profile.default_content_setting_values.media_stream_mic", json!(1)).unwrap();
-
-                let driver = WebDriver::new("http://localhost:9515", caps).await.unwrap();
-
+                let driver = web_driver.clone();
                 // Ir a la página de login
                 driver.goto("https://app.aidot.com").await.unwrap();
 
