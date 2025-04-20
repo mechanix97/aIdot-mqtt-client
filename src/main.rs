@@ -49,7 +49,6 @@ async fn main() {
 
     // caps.add_chrome_option("profile.default_content_setting_values.media_stream_mic", json!(1)).unwrap();
 
-    let web_driver = WebDriver::new("http://localhost:9515", caps).await.unwrap();
     
 
     println!("Esperando mensajes...");
@@ -60,7 +59,8 @@ async fn main() {
                 println!("Connected to broker!");
             }
             Ok(Event::Incoming(Incoming::Publish(_p))) => {
-                let driver = web_driver.clone();
+                let driver = WebDriver::new("http://localhost:9515", caps.clone()).await.unwrap();
+                
                 // Ir a la página de login
                 driver.goto("https://app.aidot.com").await.unwrap();
 
