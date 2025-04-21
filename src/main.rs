@@ -248,7 +248,8 @@ async fn take_picture(driver: &WebDriver, path: &String) {
                 datetime.minute(),
                 datetime.second(),
             );
-            std::fs::write(&filename, screenshot).unwrap();
+            std::fs::write(format!("{}now.png",path), &screenshot).unwrap();
+            std::fs::write(&filename, &screenshot).unwrap();
             println!("✅ Captura guardada como {}", filename);
         }
         None => {
