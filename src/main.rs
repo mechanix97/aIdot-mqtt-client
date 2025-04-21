@@ -237,7 +237,7 @@ async fn wait_for_video(driver: &WebDriver) -> WebDriverResult<Option<thirtyfour
      return video && video.videoWidth > 0 && video.videoHeight > 0;
  "#;
 
-    for i in 0..30 {
+    for i in 0..100 {
         println!("Intento {}: Verificando video...", i);
         match driver.execute(script, vec![]).await {
             Ok(result) => {
