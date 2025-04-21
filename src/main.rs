@@ -48,6 +48,7 @@ async fn main() {
     caps.add_chrome_arg("--disable-web-security").unwrap();
     caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
         .unwrap();
+    caps.add_chrome_option("profile.default_content_setting_values.media_stream_mic","{1}").unwrap();
 
     let (tx, _) = broadcast::channel::<(String, Vec<u8>)>(32);
 
@@ -71,6 +72,7 @@ async fn main() {
     // task 1
     let mut rx_a = tx.subscribe();
     tokio::spawn(async move {
+        println!("Spawn task 1");
         let driver = WebDriver::new("http://localhost:9515", caps.clone()).await.unwrap();
         driver.goto("https://app.aidot.com").await.unwrap();
         let current_url = driver.current_url().await.unwrap().to_string();
