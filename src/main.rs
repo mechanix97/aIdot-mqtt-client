@@ -36,6 +36,7 @@ async fn main() {
     caps.add_chrome_arg("--headless").unwrap();
     caps.add_chrome_arg("--no-sandbox").unwrap();
     caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
+    caps.add_chrome_arg("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36").unwrap();
 
     caps.add_chrome_arg("--use-fake-ui-for-media-stream")
         .unwrap();
@@ -73,15 +74,17 @@ async fn main() {
     tokio::spawn(async move {
         println!("Spawn task 1");
         let driver = WebDriver::new("http://localhost:9515", caps.clone()).await.unwrap();
-        driver.goto("https://app.aidot.com").await.unwrap();
+        driver.goto("https://app.aidot.com/SignIn").await.unwrap();
         let current_url = driver.current_url().await.unwrap().to_string();
         if current_url.contains("/SignIn") {
             // Rellenar campos de login
+            tokio::time::sleep(Duration::from_secs(3)).await;
+
             let username = driver
-                .query(By::Css("input[placeholder='User Name']"))
-                .first()
-                .await
-                .unwrap();
+            .query(By::Css("input[placeholder='User Name']"))
+            .first()
+            .await
+            .unwrap();
             username.send_keys(&user).await.unwrap();
 
             let password = driver
@@ -90,6 +93,7 @@ async fn main() {
                 .await
                 .unwrap();
             password.send_keys(&pass).await.unwrap();
+            tokio::time::sleep(Duration::from_millis(500)).await;
 
             let submit_btn = driver
                 .query(By::Css("button[type='button'].MuiButton-root"))
@@ -99,6 +103,7 @@ async fn main() {
             submit_btn.click().await.unwrap();
         }
         println!("✅ Login exitoso");
+        tokio::time::sleep(Duration::from_secs(5)).await;
 
         // Ir a la vista de la cámara
         // Suponiendo que `driver` ya está inicializado
@@ -112,7 +117,7 @@ async fn main() {
         let video_element: Option<WebElement> = wait_for_video(&driver).await.unwrap();
 
         while let Ok((topic, payload)) = rx_a.recv().await {
-            if topic == "topic/a" {
+            if topic == "aidot/get/cam1" {
                 println!("Task A: {:?}", String::from_utf8_lossy(&payload));
                 match &video_element {
                     Some(video_elem) => {
@@ -256,4 +261,3 @@ async fn wait_for_video(driver: &WebDriver) -> WebDriverResult<Option<thirtyfour
 
     Ok(None)
 }
-
