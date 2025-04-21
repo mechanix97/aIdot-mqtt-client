@@ -48,7 +48,6 @@ async fn main() {
     caps.add_chrome_arg("--disable-web-security").unwrap();
     caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
         .unwrap();
-    caps.add_chrome_option("profile.default_content_setting_values.media_stream_mic","{1}").unwrap();
 
     let (tx, _) = broadcast::channel::<(String, Vec<u8>)>(32);
 
