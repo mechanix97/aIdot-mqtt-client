@@ -30,6 +30,7 @@ dependencies = [
 name = "aiDot-rs"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "dotenv",
  "rumqttc",
  "serde",
