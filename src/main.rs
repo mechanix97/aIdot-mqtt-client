@@ -5,7 +5,8 @@ use thirtyfour::prelude::*;
 use thirtyfour::{By, WebDriver};
 use tokio;
 use dotenv::dotenv;
-use tokio::{sync::broadcast};
+use tokio::time::sleep;
+use tokio::sync::broadcast;
 
 #[tokio::main]
 async fn main() {
@@ -107,7 +108,7 @@ async fn main() {
 
         // Esperar a que el video tenga dimensiones válidas
         println!("⏳ Esperando a que el video cargue...");
-        let video_element = wait_for_video(&driver).await.unwrap();
+        let video_element: Option<WebElement> = wait_for_video(&driver).await.unwrap();
 
         while let Ok((topic, payload)) = rx_a.recv().await {
             if topic == "topic/a" {
@@ -249,6 +250,7 @@ async fn wait_for_video(driver: &WebDriver) -> WebDriverResult<Option<thirtyfour
                 println!("Error al ejecutar script: {:?}", e);
             }
         }
+        sleep(Duration::from_secs(1)).await;
     }
 
     Ok(None)
