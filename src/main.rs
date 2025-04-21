@@ -131,6 +131,11 @@ async fn main() {
         }
     });
 
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(60)).await;
+    }
+
+
     // loop {
     //     match eventloop.poll().await {
     //         Ok(Event::Incoming(Incoming::ConnAck(_))) => {
