@@ -12,13 +12,13 @@ use tokio::time::sleep;
 const TOPIC_CAM_0: &str = "aidot/get/cam0";
 const TOPIC_CAM_1: &str = "aidot/get/cam1";
 
-const PATH_CAM_0: &str = "data/cam0/";
-const PATH_CAM_1: &str = "data/cam1/";
+const PATH_CAM_0: &str = "/home/lucas/home-assistant/data/cam0/";
+const PATH_CAM_1: &str = "/home/lucas/home-assistant/data/cam1/";
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let mut mqttoptions = MqttOptions::new("test-client2", "mechardo3d.mooo.com", 1883);
+    let mut mqttoptions = MqttOptions::new("test-client2", "localhost", 1883);
     mqttoptions.set_keep_alive(Duration::from_secs(5));
 
     // Create the client and event loop
