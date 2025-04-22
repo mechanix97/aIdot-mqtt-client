@@ -24,12 +24,12 @@ async fn main() {
     // Create the client and event loop
     let (client, mut eventloop) = AsyncClient::new(mqttoptions, 10);
 
-    if let Err(e) = client.subscribe(TOPIC_CAM_0, QoS::AtMostOnce).await {
+    if let Err(e) = client.subscribe(TOPIC_CAM_0, QoS::AtLeastOnce).await {
         eprintln!("Failed to subscribe: {:?}", e);
         return;
     }
 
-    if let Err(e) = client.subscribe(TOPIC_CAM_1, QoS::AtMostOnce).await {
+    if let Err(e) = client.subscribe(TOPIC_CAM_1, QoS::AtLeastOnce).await {
         eprintln!("Failed to subscribe: {:?}", e);
         return;
     }
@@ -44,13 +44,17 @@ async fn main() {
     /* chrome args */
     caps.add_chrome_arg("--headless").unwrap();
     caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
-    caps.add_chrome_arg("--use-fake-ui-for-media-stream").unwrap();
-    caps.add_chrome_arg("--use-fake-device-for-media-stream").unwrap();
-    caps.add_chrome_arg("--allow-file-access-from-files").unwrap();
+    caps.add_chrome_arg("--use-fake-ui-for-media-stream")
+        .unwrap();
+    caps.add_chrome_arg("--use-fake-device-for-media-stream")
+        .unwrap();
+    caps.add_chrome_arg("--allow-file-access-from-files")
+        .unwrap();
     caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
     caps.add_chrome_arg("--no-sandbox").unwrap();
     caps.add_chrome_arg("--disable-web-security").unwrap();
-    caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process").unwrap();
+    caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
+        .unwrap();
 
     let (tx, _) = broadcast::channel::<(String, Vec<u8>)>(32);
 
@@ -60,7 +64,7 @@ async fn main() {
         loop {
             match eventloop.poll().await {
                 Ok(Event::Incoming(Incoming::ConnAck(_))) => {
-                    println!("Connected to broker!");
+                    //  println!("Connected to broker!");
                 }
                 Ok(Event::Incoming(Incoming::Publish(p))) => {
                     let _ = tx_clone.send((p.topic.clone(), p.payload.to_vec()));
@@ -148,14 +152,14 @@ async fn main() {
 
     loop {
         client
-            .publish(TOPIC_CAM_0, QoS::AtMostOnce, false, "")
+            .publish(TOPIC_CAM_0, QoS::AtLeastOnce, false, "")
             .await
             .unwrap();
         client
-            .publish(TOPIC_CAM_1, QoS::AtMostOnce, false, "")
+            .publish(TOPIC_CAM_1, QoS::AtLeastOnce, false, "")
             .await
             .unwrap();
-        
+
         let offset = FixedOffset::west_opt(3 * 3600).expect("Offset inválido");
         let datetime = Utc::now().with_timezone(&offset);
 
@@ -248,7 +252,7 @@ async fn take_picture(driver: &WebDriver, path: &String) {
                 datetime.minute(),
                 datetime.second(),
             );
-            std::fs::write(format!("{}now.png",path), &screenshot).unwrap();
+            std::fs::write(format!("{}now.png", path), &screenshot).unwrap();
             std::fs::write(&filename, &screenshot).unwrap();
             println!("✅ Captura guardada como {}", filename);
         }
