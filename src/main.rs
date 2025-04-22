@@ -1,5 +1,6 @@
 use chrono::{Datelike, FixedOffset, Timelike, Utc};
 use dotenv::dotenv;
+use log::{error, info};
 use rumqttc::{AsyncClient, Event, Incoming, MqttOptions, QoS};
 use std::env::var;
 use std::time::Duration;
@@ -25,12 +26,12 @@ async fn main() {
     let (client, mut eventloop) = AsyncClient::new(mqttoptions, 10);
 
     if let Err(e) = client.subscribe(TOPIC_CAM_0, QoS::AtLeastOnce).await {
-        eprintln!("Failed to subscribe: {:?}", e);
+        error!("Failed to subscribe: {:?}", e);
         return;
     }
 
     if let Err(e) = client.subscribe(TOPIC_CAM_1, QoS::AtLeastOnce).await {
-        eprintln!("Failed to subscribe: {:?}", e);
+        error!("Failed to subscribe: {:?}", e);
         return;
     }
 
@@ -42,18 +43,16 @@ async fn main() {
     let mut caps = DesiredCapabilities::chrome();
 
     /* chrome args */
-    // caps.add_chrome_arg("--headless").unwrap();
-    // caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
-    // caps.add_chrome_arg("--use-fake-ui-for-media-stream")
+    // caps.add_arg("--headless").unwrap();
+    // caps.add_arg("--disable-setuid-sandbox").unwrap();
+    // caps.add_arg("--use-fake-ui-for-media-stream")
     //     .unwrap();
-    caps.add_chrome_arg("--use-fake-device-for-media-stream")
-        .unwrap();
-    caps.add_chrome_arg("--allow-file-access-from-files")
-        .unwrap();
-    // caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
-    // caps.add_chrome_arg("--no-sandbox").unwrap();
-    // caps.add_chrome_arg("--disable-web-security").unwrap();
-    // caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
+    caps.add_arg("--use-fake-device-for-media-stream").unwrap();
+    caps.add_arg("--allow-file-access-from-files").unwrap();
+    // caps.add_arg("--allow-insecure-localhost").unwrap();
+    // caps.add_arg("--no-sandbox").unwrap();
+    // caps.add_arg("--disable-web-security").unwrap();
+    // caps.add_arg("--disable-features=IsolateOrigins,site-per-process")
     //     .unwrap();
 
     let (tx, _) = broadcast::channel::<(String, Vec<u8>)>(32);
@@ -160,21 +159,24 @@ async fn main() {
             .await
             .unwrap();
 
-        let offset = FixedOffset::west_opt(3 * 3600).expect("Offset inválido");
-        let datetime = Utc::now().with_timezone(&offset);
-
-        println!(
-            "TICK {:04}{:02}{:02}{:02}{:02}{:02}",
-            datetime.year(),
-            datetime.month(),
-            datetime.day(),
-            datetime.hour(),
-            datetime.minute(),
-            datetime.second()
-        );
+        println!("TICK {}", get_timestamp());
 
         tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
     }
+}
+
+fn get_timestamp() -> String {
+    let offset = FixedOffset::west_opt(3 * 3600).expect("Offset inválido");
+    let datetime = Utc::now().with_timezone(&offset);
+    format!(
+        "{:04}{:02}{:02}{:02}{:02}{:02}",
+        datetime.year(),
+        datetime.month(),
+        datetime.day(),
+        datetime.hour(),
+        datetime.minute(),
+        datetime.second()
+    )
 }
 
 async fn driver_sign_in(driver: &WebDriver, user: &String, pass: &String) {
@@ -189,14 +191,14 @@ async fn driver_sign_in(driver: &WebDriver, user: &String, pass: &String) {
             .first()
             .await
             .unwrap();
-        username.send_keys(&user).await.unwrap();
+        username.send_keys(user).await.unwrap();
 
         let password = driver
             .query(By::Css("input[placeholder='Password']"))
             .first()
             .await
             .unwrap();
-        password.send_keys(&pass).await.unwrap();
+        password.send_keys(pass).await.unwrap();
         tokio::time::sleep(Duration::from_millis(500)).await;
 
         let submit_btn = driver
@@ -232,26 +234,12 @@ async fn wait_for_video(driver: &WebDriver) -> Option<thirtyfour::WebElement> {
 }
 
 async fn take_picture(driver: &WebDriver, path: &String) {
-    let offset = FixedOffset::west_opt(3 * 3600).expect("Offset inválido");
-
     match &wait_for_video(&driver).await {
         Some(video_elem) => {
-            println!("✅ Video cargado con dimensiones válidas");
-
             // Tomar captura de pantalla solo del elemento <video>
             println!("📸 Tomando captura del elemento <video>...");
             let screenshot = video_elem.screenshot_as_png().await.unwrap();
-            let datetime = Utc::now().with_timezone(&offset);
-            let filename = format!(
-                "{}{:04}{:02}{:02}{:02}{:02}{:02}.png",
-                path,
-                datetime.year(),
-                datetime.month(),
-                datetime.day(),
-                datetime.hour(),
-                datetime.minute(),
-                datetime.second(),
-            );
+            let filename = format!("{}{}.png", path, get_timestamp());
             std::fs::write(format!("{}now.png", path), &screenshot).unwrap();
             std::fs::write(&filename, &screenshot).unwrap();
             println!("✅ Captura guardada como {}", filename);
