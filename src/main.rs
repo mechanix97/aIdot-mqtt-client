@@ -46,10 +46,10 @@ async fn main() {
     // caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
     // caps.add_chrome_arg("--use-fake-ui-for-media-stream")
     //     .unwrap();
-    // caps.add_chrome_arg("--use-fake-device-for-media-stream")
-    //     .unwrap();
-    // caps.add_chrome_arg("--allow-file-access-from-files")
-    //     .unwrap();
+    caps.add_chrome_arg("--use-fake-device-for-media-stream")
+        .unwrap();
+    caps.add_chrome_arg("--allow-file-access-from-files")
+        .unwrap();
     // caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
     // caps.add_chrome_arg("--no-sandbox").unwrap();
     // caps.add_chrome_arg("--disable-web-security").unwrap();
