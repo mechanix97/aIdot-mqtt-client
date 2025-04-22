@@ -42,19 +42,19 @@ async fn main() {
     let mut caps = DesiredCapabilities::chrome();
 
     /* chrome args */
-    caps.add_chrome_arg("--headless").unwrap();
-    caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
-    caps.add_chrome_arg("--use-fake-ui-for-media-stream")
-        .unwrap();
-    caps.add_chrome_arg("--use-fake-device-for-media-stream")
-        .unwrap();
-    caps.add_chrome_arg("--allow-file-access-from-files")
-        .unwrap();
-    caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
-    caps.add_chrome_arg("--no-sandbox").unwrap();
-    caps.add_chrome_arg("--disable-web-security").unwrap();
-    caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
-        .unwrap();
+    // caps.add_chrome_arg("--headless").unwrap();
+    // caps.add_chrome_arg("--disable-setuid-sandbox").unwrap();
+    // caps.add_chrome_arg("--use-fake-ui-for-media-stream")
+    //     .unwrap();
+    // caps.add_chrome_arg("--use-fake-device-for-media-stream")
+    //     .unwrap();
+    // caps.add_chrome_arg("--allow-file-access-from-files")
+    //     .unwrap();
+    // caps.add_chrome_arg("--allow-insecure-localhost").unwrap();
+    // caps.add_chrome_arg("--no-sandbox").unwrap();
+    // caps.add_chrome_arg("--disable-web-security").unwrap();
+    // caps.add_chrome_arg("--disable-features=IsolateOrigins,site-per-process")
+    //     .unwrap();
 
     let (tx, _) = broadcast::channel::<(String, Vec<u8>)>(32);
 
